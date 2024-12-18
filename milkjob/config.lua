@@ -19,6 +19,12 @@ Config.NPC = {
     }
 }
 
+Config.Vehicle = {
+    model = 'bison', -- Vehicle model
+    coords = vector3(-1318.32, -2805.43, 13.94), -- Vehicle spawn location
+    heading = 90.0
+}
+
 Config.Cows = {
     Locations = {
         { coords = vector3(-1323.35, -2791.7, 13.94), heading = 90.0 },
