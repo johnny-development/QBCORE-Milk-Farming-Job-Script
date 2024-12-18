@@ -16,16 +16,20 @@ local function spawnNPCs()
     SetEntityInvincible(jobPed, true)
     SetBlockingOfNonTemporaryEvents(jobPed, true)
 
-    -- Add Job NPC Blip
-    local jobBlip = AddBlipForCoord(jobNPC.coords.x, jobNPC.coords.y, jobNPC.coords.z)
-    SetBlipSprite(jobBlip, 442) -- Briefcase icon
-    SetBlipDisplay(jobBlip, 4)
-    SetBlipScale(jobBlip, 0.8)
-    SetBlipColour(jobBlip, 5) -- Yellow
-    SetBlipAsShortRange(jobBlip, true)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentString("Milk Job Start")
-    EndTextCommandSetBlipName(jobBlip)
+    -- Add interaction for Job NPC
+    if Config.UseQBTarget then
+        exports['qb-target']:AddTargetEntity(jobPed, {
+            options = {
+                {
+                    type = 'client',
+                    event = 'milkjob:startJob',
+                    icon = 'fas fa-briefcase',
+                    label = 'Start Milk Job'
+                }
+            },
+            distance = 2.5
+        })
+    end
 
     -- Spawn Sell NPC
     local sellNPC = Config.NPC.SellNPC
@@ -37,16 +41,20 @@ local function spawnNPCs()
     SetEntityInvincible(sellPed, true)
     SetBlockingOfNonTemporaryEvents(sellPed, true)
 
-    -- Add Sell NPC Blip
-    local sellBlip = AddBlipForCoord(sellNPC.coords.x, sellNPC.coords.y, sellNPC.coords.z)
-    SetBlipSprite(sellBlip, 605) -- Dollar icon
-    SetBlipDisplay(sellBlip, 4)
-    SetBlipScale(sellBlip, 0.8)
-    SetBlipColour(sellBlip, 11) -- Blue
-    SetBlipAsShortRange(sellBlip, true)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentString("Milk Selling Point")
-    EndTextCommandSetBlipName(sellBlip)
+    -- Add interaction for Sell NPC
+    if Config.UseQBTarget then
+        exports['qb-target']:AddTargetEntity(sellPed, {
+            options = {
+                {
+                    type = 'client',
+                    event = 'milkjob:sellMilk',
+                    icon = 'fas fa-dollar-sign',
+                    label = 'Sell Milk'
+                }
+            },
+            distance = 2.5
+        })
+    end
 end
 
 -- Spawn Cows
@@ -64,7 +72,7 @@ local function spawnCows()
 
         milkingProgress[i] = false -- Initialize milking progress for this cow
 
-        -- Add interaction
+        -- Add interaction for cows
         if Config.UseQBTarget then
             exports['qb-target']:AddTargetEntity(cowPed, {
                 options = {
@@ -78,21 +86,18 @@ local function spawnCows()
                 },
                 distance = 2.5
             })
-        else
-            exports['qtarget']:AddTargetEntity(cowPed, {
-                options = {
-                    {
-                        type = 'client',
-                        event = 'milkjob:milkCow',
-                        icon = 'fas fa-hand-holding-water',
-                        label = 'Milk the Cow',
-                        cowIndex = i
-                    }
-                },
-                distance = 2.5
-            })
         end
     end
+end
+
+-- Play Animation
+local function playMilkingAnimation()
+    local ped = PlayerPedId()
+    RequestAnimDict("amb@medic@standing@kneel@base")
+    while not HasAnimDictLoaded("amb@medic@standing@kneel@base") do
+        Wait(10)
+    end
+    TaskPlayAnim(ped, "amb@medic@standing@kneel@base", "base", 8.0, -8.0, -1, 49, 0, false, false, false)
 end
 
 -- Start Milk Job
@@ -120,16 +125,47 @@ RegisterNetEvent('milkjob:startJob', function()
     TriggerEvent('QBCore:Notify', 'You have started the milk farming job. Milk all the cows to complete your task!', 'success')
 end)
 
--- Milk Cow
+-- Milk Cow Event
 RegisterNetEvent('milkjob:milkCow', function(data)
-    -- Handle milking logic (same as before)
+    local cowIndex = data.cowIndex
+    if milkingProgress[cowIndex] then
+        TriggerEvent('QBCore:Notify', 'This cow has already been milked!', 'error')
+        return
+    end
+
+    playMilkingAnimation()
+
+    QBCore.Functions.Progressbar('milking_cow', 'Milking the Cow...', 10000, false, true, {
+        disableMovement = true,
+        disableCarMovement = true,
+        disableMouse = false,
+        disableCombat = true,
+    }, {}, {}, {}, function()
+        milkingProgress[cowIndex] = true
+        TriggerServerEvent('milkjob:rewardMilk')
+        ClearPedTasks(PlayerPedId())
+        TriggerEvent('QBCore:Notify', 'You have milked the cow!', 'success')
+    end, function()
+        ClearPedTasks(PlayerPedId())
+        TriggerEvent('QBCore:Notify', 'You canceled the milking process.', 'error')
+    end)
 end)
 
--- Sell Milk
+-- Sell Milk Event
 RegisterNetEvent('milkjob:sellMilk', function()
-    -- Handle selling logic (same as before)
+    if not hasJob then
+        TriggerEvent('QBCore:Notify', 'You need to start the milk farming job first!', 'error')
+        return
+    end
+
+    TriggerServerEvent('milkjob:sellMilk')
+    TriggerEvent('QBCore:Notify', 'You have completed the milk job. Come back to the job NPC to start again!', 'success')
+    hasJob = false
+    currentTask = nil
+    milkingProgress = {} -- Reset progress
 end)
 
+-- Initialize
 CreateThread(function()
     spawnNPCs()
     spawnCows()
