@@ -31,6 +31,17 @@ local function spawnNPCs()
         })
     end
 
+    -- Add Job NPC Blip
+    local jobBlip = AddBlipForCoord(jobNPC.coords.x, jobNPC.coords.y, jobNPC.coords.z)
+    SetBlipSprite(jobBlip, 442) -- Briefcase icon
+    SetBlipDisplay(jobBlip, 4)
+    SetBlipScale(jobBlip, 0.8)
+    SetBlipColour(jobBlip, 5) -- Yellow
+    SetBlipAsShortRange(jobBlip, true)
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentString("Milk Job Start")
+    EndTextCommandSetBlipName(jobBlip)
+
     -- Spawn Sell NPC
     local sellNPC = Config.NPC.SellNPC
     local sellPedModel = GetHashKey(sellNPC.model)
@@ -55,6 +66,17 @@ local function spawnNPCs()
             distance = 2.5
         })
     end
+
+    -- Add Sell NPC Blip
+    local sellBlip = AddBlipForCoord(sellNPC.coords.x, sellNPC.coords.y, sellNPC.coords.z)
+    SetBlipSprite(sellBlip, 605) -- Dollar icon
+    SetBlipDisplay(sellBlip, 4)
+    SetBlipScale(sellBlip, 0.8)
+    SetBlipColour(sellBlip, 11) -- Blue
+    SetBlipAsShortRange(sellBlip, true)
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentString("Milk Selling Point")
+    EndTextCommandSetBlipName(sellBlip)
 end
 
 -- Spawn Cows
@@ -70,7 +92,16 @@ local function spawnCows()
         SetBlockingOfNonTemporaryEvents(cowPed, true)
         SetPedCanRagdoll(cowPed, false)
 
-        milkingProgress[i] = false -- Initialize milking progress for this cow
+        -- Add Cow Blip
+        local cowBlip = AddBlipForCoord(cow.coords.x, cow.coords.y, cow.coords.z)
+        SetBlipSprite(cowBlip, 442) -- Cow icon (can be customized)
+        SetBlipDisplay(cowBlip, 4)
+        SetBlipScale(cowBlip, 0.7)
+        SetBlipColour(cowBlip, 25) -- Green
+        SetBlipAsShortRange(cowBlip, true)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentString("Milking Cow")
+        EndTextCommandSetBlipName(cowBlip)
 
         -- Add interaction for cows
         if Config.UseQBTarget then
@@ -88,16 +119,6 @@ local function spawnCows()
             })
         end
     end
-end
-
--- Play Animation
-local function playMilkingAnimation()
-    local ped = PlayerPedId()
-    RequestAnimDict("amb@medic@standing@kneel@base")
-    while not HasAnimDictLoaded("amb@medic@standing@kneel@base") do
-        Wait(10)
-    end
-    TaskPlayAnim(ped, "amb@medic@standing@kneel@base", "base", 8.0, -8.0, -1, 49, 0, false, false, false)
 end
 
 -- Start Milk Job
@@ -133,8 +154,6 @@ RegisterNetEvent('milkjob:milkCow', function(data)
         return
     end
 
-    playMilkingAnimation()
-
     QBCore.Functions.Progressbar('milking_cow', 'Milking the Cow...', 10000, false, true, {
         disableMovement = true,
         disableCarMovement = true,
@@ -143,10 +162,8 @@ RegisterNetEvent('milkjob:milkCow', function(data)
     }, {}, {}, {}, function()
         milkingProgress[cowIndex] = true
         TriggerServerEvent('milkjob:rewardMilk')
-        ClearPedTasks(PlayerPedId())
         TriggerEvent('QBCore:Notify', 'You have milked the cow!', 'success')
     end, function()
-        ClearPedTasks(PlayerPedId())
         TriggerEvent('QBCore:Notify', 'You canceled the milking process.', 'error')
     end)
 end)
@@ -156,6 +173,13 @@ RegisterNetEvent('milkjob:sellMilk', function()
     if not hasJob then
         TriggerEvent('QBCore:Notify', 'You need to start the milk farming job first!', 'error')
         return
+    end
+
+    -- Despawn the vehicle
+    if spawnedVehicle and DoesEntityExist(spawnedVehicle) then
+        DeleteEntity(spawnedVehicle)
+        spawnedVehicle = nil
+        TriggerEvent('QBCore:Notify', 'Your vehicle has been removed.', 'info')
     end
 
     TriggerServerEvent('milkjob:sellMilk')
