@@ -28,20 +28,7 @@ Config.Vehicle = {
 Config.Cows = {
     Locations = {
         { coords = vector3(-1323.35, -2791.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1325.35, -2793.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1327.35, -2795.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1329.35, -2797.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1331.35, -2799.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1333.35, -2801.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1335.35, -2803.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1337.35, -2805.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1339.35, -2807.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1341.35, -2809.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1343.35, -2811.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1345.35, -2813.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1347.35, -2815.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1349.35, -2817.7, 13.94), heading = 90.0 },
-        { coords = vector3(-1351.35, -2819.7, 13.94), heading = 90.0 }
+        { coords = vector3(-1325.35, -2793.7, 13.94), heading = 90.0 }
     }
 }
 
