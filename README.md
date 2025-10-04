@@ -1,4 +1,4 @@
-### **🚜 Milk Farming Job Script by Dingos Development 🐄**
+# **🚜 Milk Farming Job Script by Dingos Development 🐄**
 
 🌟 **Features**:
 - 🗺️ **Interactive Map Blips**:
@@ -27,9 +27,15 @@
 - Works with both 🛠️ **QB-Inventory** and 🔧 **OX Inventory**.
 - Toggle between 🎯 **QB-Target** and **QTarget** for interactions.
 
-💡 Perfect for RP servers looking for unique and engaging farming jobs! 
+# REQUIREMENTS
 
+YOU NEED TO ADD THIS TO YOUR ITEMS!
+
+FOR QBCORE inventory!
+`lua
+['milk_bucket'] 				 = {['name'] = 'milk_bucket', 			  	  	['label'] = 'Bucket', 			['weight'] = 1000, 		['type'] = 'item', 		['image'] = 'milkbucket.png', 			['unique'] = true, 		['useable'] = false, ['shouldClose'] = true,	   ['combinable'] = nil,   ['description'] = 'Milk bucket go sell it'},
+`
 ---
 
-👨‍💻 **Developer**: Johnny  
+👨‍💻 **Developer**: Dingo  
 🏢 **Dingos Development**  
