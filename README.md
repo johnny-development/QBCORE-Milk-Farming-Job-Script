@@ -32,7 +32,7 @@
 YOU NEED TO ADD THIS TO YOUR ITEMS!
 
 FOR QBCORE inventory!
-`lua
+` lua
 ['milk_bucket'] 				 = {['name'] = 'milk_bucket', 			  	  	['label'] = 'Bucket', 			['weight'] = 1000, 		['type'] = 'item', 		['image'] = 'milkbucket.png', 			['unique'] = true, 		['useable'] = false, ['shouldClose'] = true,	   ['combinable'] = nil,   ['description'] = 'Milk bucket go sell it'}, `
 ---
 
